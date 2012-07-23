@@ -13,17 +13,18 @@ A4        = pagesizes.A4
 
 class Document(canvas.Canvas):
 
-  def __init__(self, *args, **kwargs):
+  def __init__(self, filename, title=None, pagesize=None):
     ''' extends/initialize canvas '''
     
-    title = kwargs.pop('title') if 'title' in kwargs else '<Unknown>'
+    title = '<Unknown>' if title==None else title
+    size  = A4 if pagesize==None else pagesize
      
-    canvas.Canvas.__init__(self, *args, **kwargs)
+    canvas.Canvas.__init__(self, filename, pagesize=size)
 
     self.setTitle(title)
     self.pageCount          = 0
 
-    self.pagesize           = kwargs['pagesize'] if 'pagesize' in kwargs else A4
+    self.pagesize           = size
     self.width, self.height = self.pagesize
     
     self.x                  = 0
