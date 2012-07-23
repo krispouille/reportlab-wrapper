@@ -23,7 +23,7 @@ class Document(canvas.Canvas):
     self.setTitle(title)
     self.pageCount          = 0
 
-    self.pagesize           = kwargs['pagesize']
+    self.pagesize           = kwargs['pagesize'] if 'pagesize' in kwargs else A4
     self.width, self.height = self.pagesize
     
     self.x                  = 0
