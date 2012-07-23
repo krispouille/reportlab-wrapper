@@ -9,8 +9,10 @@ This project is an attempt to wrap the Reportlab current API in order to generat
 $ git clone https://github.com/krispouille/reportlab-wrapper
 
 2- In your project directory, create your python script for a test
-```
+
+```python
 from wrapper.pdf import Document, A4
+from wrapper.styles import h2, p
 
 # Initialize PDF
 pdf = Document('test.php', 'MY_TITLE')
