@@ -10,7 +10,8 @@ pdf.padding(left=40,right=40,top=40,bottom=40)
 
 pdf.page(
   h2('About This Document'),
-  p('This document is an attempt for me to wrap the current Reportlab Toolkit API in order to make PDFs easily.')
+  p('This document explains my attempt to wrap the current Reportlab Toolkit API in order to make PDFs easily.'),
+  h3('How it works')
 )
 
 pdf.page(layout=last_cover)

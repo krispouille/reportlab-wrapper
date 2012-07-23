@@ -18,20 +18,15 @@ def table(datas):
 DEFAULT = ParagraphStyle('default',
   fontName = 'Times-Roman',#Helvetica
   fontSize = 13,
-  leading  = 15.6 
+  leading  = 15.6,
+  spaceAfter = 6
 )
 H2 = ParagraphStyle('H2',
   fontName  = 'Helvetica-Bold',
   fontSize  = 20,
   textColor = '#17365d',
-  leading  = 24
-)
-H2_SPACE = ParagraphStyle('H2_SPACE',
-  fontName = 'Helvetica-Bold',
-  fontSize = 20,
-  textColor = '#17365d',
-  leading = 24,
-  spaceAfter=6
+  leading  = 24,
+  spaceAfter = 6,
 )
 H3 = ParagraphStyle('H3',
   fontName   = 'Helvetica-Bold',
