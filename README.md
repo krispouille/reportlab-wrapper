@@ -15,7 +15,7 @@ from wrapper.pdf import Document, A4
 from wrapper.styles import h2, p
 
 # Initialize PDF
-pdf = Document('test.php', 'MY_TITLE')
+pdf = Document('test.pdf', 'MY_TITLE')
 
 pdf.page(
   h2('MY_TITLE'),
