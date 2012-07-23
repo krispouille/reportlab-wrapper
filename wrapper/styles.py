@@ -42,12 +42,12 @@ DEFAULT_TABLE = TableStyle([
  # ('TOPPADDING', (0,0), (-1,-1), 0),
  # ('BOTTOMPADDING', (0,0), (-1,-1), 0),
 ])
-COVER_TITLE  = ParagraphStyle('cover.title', 
+COVER_TITLE_1  = ParagraphStyle('cover_title_1', 
   fontSize  = 50, 
   leading   = 62, 
   textColor = '#ffffff'
 ) 
-COVER_DOMAIN = ParagraphStyle('cover_domain', 
+COVER_TITLE_2 = ParagraphStyle('cover_title_2', 
   fontName  = 'Helvetica-Bold',
   fontSize  = 40, 
   leading   = 52, 

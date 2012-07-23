@@ -1,12 +1,12 @@
 from wrapper.pdf      import Document, A4
 from wrapper.styles   import p, h2, h3
-from wrapper.layouts  import first_cover, last_cover
+from wrapper.layouts  import firstCover, lastCover
 
 # Initialize PDF
 pdf = Document('test.pdf', title='My Title Test', pagesize=A4)
 
 # start page applying a specific layout "first_cover"
-pdf.page(layout=first_cover)
+pdf.page(layout=firstCover)
 
 # change paddings for next pages by setting all to 40 points
 pdf.padding(left=40,right=40,top=40,bottom=40)
@@ -19,7 +19,7 @@ pdf.page(
 )
 
 # start page applying a layout "last_cover"
-pdf.page(layout=last_cover)
+pdf.page(layout=lastCover)
 
 # save and close document
 pdf.close()
