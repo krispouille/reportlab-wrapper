@@ -2,8 +2,11 @@ from wrapper.pdf      import Document, A4
 from wrapper.styles   import p, h2, h3
 from wrapper.layouts  import firstCover, lastCover
 
+# output file
+output = 'pdf/'+__file__[:-3]+'.pdf'
+
 # Initialize PDF
-pdf = Document('test.pdf', title='My Title Test', pagesize=A4)
+pdf = Document(output, title='My Title Test', pagesize=A4)
 
 # start page applying a specific layout "first_cover"
 pdf.page(layout=firstCover)
