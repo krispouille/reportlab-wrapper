@@ -68,22 +68,6 @@ class Document(canvas.Canvas):
     
     return (x,y)
 
-  def resize(self):
-    ''' calibrate page with, height, x, y depending on left,right,top,bottom values '''
-    
-    x = self.left 
-    y = self.bottom
-    
-    #x1 = x if self.x==x else x+self.x if x>self.x else x-self.x
-    #y1 = y if self.y==y else y+self.y if y>self.y else y-self.y
-
-    self.width  = self.pagesize[0]-self.left-self.right
-    self.height = self.pagesize[1]-self.bottom-self.top
-    self.translate(self.left,self.bottom)
-    
-    self.x = x 
-    self.y = y
-
   def padding(self,bottom=None,top=None,left=None,right=None):
     ''' edit paddings '''
 
@@ -92,12 +76,11 @@ class Document(canvas.Canvas):
     left   = left   if left!=None   else self.left
     right  = right  if right!=None  else self.right
     
-    #if self.left!=left or self.right!=right or self.top!=top or self.bottom!=bottom:
     tx = left-self.left
     ty = bottom-self.bottom
     x  = tx if tx!=0 else left
     y  = ty if ty!=0 else bottom
-    #self.translate(self.pagesize[0]-self.width-self.right,self.pagesize[1]-self.height-self.top)
+    
     self.bottom = bottom
     self.top    = top
     self.left   = left
@@ -105,9 +88,8 @@ class Document(canvas.Canvas):
     self.width  = self.pagesize[0]-self.left-self.right
     self.height = self.pagesize[1]-self.bottom-self.top
 
-    print self.width,self.height,tx, ty
+    #print self.width,self.height,tx, ty
     self.translate(tx,ty)
-    #self.resize()
     
 
   def page(self,*args,**config):
