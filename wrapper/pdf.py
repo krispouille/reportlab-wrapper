@@ -29,25 +29,11 @@ class Document(canvas.Canvas):
     
     self.x                  = 0
     self.y                  = 0
-    self.padding(top=0, bottom=0, left=0, right=0)
+    self.left               = 0
+    self.right              = 0
+    self.top                = 0
+    self.bottom             = 0
 
-  def resize(self):
-    self.width  = self.pagesize[0]-self.left-self.right
-    self.height = self.pagesize[1]-self.bottom-self.top
-
-    x = self.left 
-    y = self.bottom
-    
-    #if self.x==x and self.y==y: return
- 
-    x1 = x if self.x==x else x+self.x if x>self.x else x-self.x
-    y1 = y if self.y==y else y+self.y if y>self.y else y-self.y
-
-    self.translate(x1,y1)
-
-    
-    self.x = x 
-    self.y = y
 
   def placement(self, width=0, height=0, left=0, bottom=0, top=None, right=None):
     '''
@@ -82,14 +68,47 @@ class Document(canvas.Canvas):
     
     return (x,y)
 
+  def resize(self):
+    ''' calibrate page with, height, x, y depending on left,right,top,bottom values '''
+    
+    x = self.left 
+    y = self.bottom
+    
+    #x1 = x if self.x==x else x+self.x if x>self.x else x-self.x
+    #y1 = y if self.y==y else y+self.y if y>self.y else y-self.y
+
+    self.width  = self.pagesize[0]-self.left-self.right
+    self.height = self.pagesize[1]-self.bottom-self.top
+    self.translate(self.left,self.bottom)
+    
+    self.x = x 
+    self.y = y
+
   def padding(self,bottom=None,top=None,left=None,right=None):
     ''' edit paddings '''
 
-    self.bottom = bottom if bottom!=None else self.bottom
-    self.top = top if top!=None else self.top
-    self.left = left if left!=None else self.left
-    self.right = right if right!=None else self.right
-    self.resize()
+    bottom = bottom if bottom!=None else self.bottom
+    top    = top    if top!=None    else self.top
+    left   = left   if left!=None   else self.left
+    right  = right  if right!=None  else self.right
+    
+    #if self.left!=left or self.right!=right or self.top!=top or self.bottom!=bottom:
+    tx = left-self.left
+    ty = bottom-self.bottom
+    x  = tx if tx!=0 else left
+    y  = ty if ty!=0 else bottom
+    #self.translate(self.pagesize[0]-self.width-self.right,self.pagesize[1]-self.height-self.top)
+    self.bottom = bottom
+    self.top    = top
+    self.left   = left
+    self.right  = right
+    self.width  = self.pagesize[0]-self.left-self.right
+    self.height = self.pagesize[1]-self.bottom-self.top
+
+    print self.width,self.height,tx, ty
+    self.translate(tx,ty)
+    #self.resize()
+    
 
   def page(self,*args,**config):
     ''' 
@@ -97,29 +116,35 @@ class Document(canvas.Canvas):
     Merge the defaults page configuration with the new one
     Apply all changes to this new page
     '''
-    story = list(args)#
-    size = len(story)#
-    
-    loop = 1 if size==0 else size#
+    def _page(c):
+      ''' sub-function to handle display of a page'''
 
-    if self.pageCount > 0: self.showPage()
+      if self.pageCount > 0 : 
+        self.showPage()
+        self.translate(self.left,self.bottom)
+      self.setPageSize(self.pagesize)
 
-    while(loop>0):#
-     self.pageCount = self.pageCount + 1
+      color  = c.pop('color') if 'color' in c else None
+      layout = c.pop('layout') if 'layout' in c else None
+
+      self.padding(**c)
+
+      self.pageCount = self.pageCount + 1
+      if color: self.color(color)
+      if layout: layout(self)
+ 
+    story = list(args)
     
-     self.pagesize = config['pagesize'] if 'pagesize' in config else self.pagesize
-     self.width,self.height = self.pagesize
-     self.setPageSize(self.pagesize)
+    if 'pagesize' in config:
+      self.pagesize = config.pop('pagesize')
+      self.width,self.height = self.pagesize
     
-     self.padding(
-       top    = config['top']    if 'top'    in config else None,
-       bottom = config['bottom'] if 'bottom' in config else None,
-       left   = config['left']   if 'left'   in config else None,
-       right  = config['right']  if 'right'  in config else None
-     )
-     if 'layout' in config: config['layout'](self)#
-     if size>0: self.frame(story)#
-     loop = loop -1#
+    if len(story)==0:
+      _page(config)
+    else:
+      while(story):
+        _page(dict(config))
+        self.frame(story)
 
   def image(self, filename, width=None, height=None, left=0, bottom=0, top=None, right=None, mask=None, preserveAspectRatio=False, anchor='c'):
     ''' add an image to canvas '''
@@ -158,6 +183,7 @@ class Document(canvas.Canvas):
 
   def rectangle(self,width='100%',height='100%',left=0,bottom=0,top=None,right=None,color='#eeeeee'):
     ''' draw a rectangle  '''
+
     self.saveState()
     self.setFillColor(HexColor(color))
     width  = checkPercent(width, self.width)
@@ -171,13 +197,16 @@ class Document(canvas.Canvas):
     
     self.rectangle(color=c,width='100%',height='100%')
 
-  def line(self,width='100%',height=1,left=0,bottom=0,top=None,right=None,color='#000'):
+  def line(self,width='100%',height=1,left=None,bottom=None,top=None,right=None,color='#000'):
     ''' draw a line '''
+
     self.rectangle(width,height,left,bottom,top,right,color)
   
   def frame(self,story,width='100%',height='100%',left=0,bottom=0,top=None,right=None):
     ''' create a zone that will contain flowable elements '''
+
     self.saveState()
+    
     width  = checkPercent(width, self.width)
     height = checkPercent(height, self.height)
     x,y    = self.placement(width,height,left,bottom,top,right)
@@ -199,6 +228,7 @@ def checkPercent(string, reference):
   print checkPercent('10%',100) returns 10 (good format "xx%")
   print checkPercent(1200,100)  returns 1200 (bad format)
   '''
+
   if string==None: return string
   try:
     return int(string)
