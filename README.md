@@ -65,7 +65,7 @@ pdf.page(
   color='#e6eeee'
 )
  
-# start page applying a layout "lastCover"
+# start page with a background color and no padding
 pdf.page(color='#336391',left=0,right=0,top=0,bottom=0)
  
 # save and close document
