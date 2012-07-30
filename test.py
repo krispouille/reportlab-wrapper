@@ -25,7 +25,7 @@ output = 'pdf/'+__file__[:-3]+'.pdf'
 # initialize PDF
 pdf = Document(output, title='Example')
 
-# create your text styles
+# create your own text formats
 h1 = pdf.style('h1', font='Helvetica-Bold', size=20, color='#17365d')
 p  = pdf.style('p',  font='Times-Roman')
 
