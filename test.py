@@ -2,27 +2,6 @@ from wrapper.pdf          import Document, A4
 from reportlab.platypus   import Paragraph
 from reportlab.lib.styles import ParagraphStyle
 
-##### custom styles #####
-
-def h1(text):
-  ''' returns a Paragraph formatted as a title '''
-  return Paragraph(text, ParagraphStyle('h1',
-    fontName   = 'Helvetica-Bold',
-    fontSize   = 20,
-    textColor  = '#17365d',
-    leading    = 24,
-    spaceAfter = 6
-  ))
-
-def p(text):
-  ''' returns a Paragraph to be added to a page '''
-  return Paragraph(text, ParagraphStyle('p',
-    fontName   = 'Times-Roman',
-    fontSize   = 13,
-    leading    = 15.6,
-    spaceAfter = 6
-  ))
-
 ##### custom layouts #####
 
 def firstCover(pdf):
@@ -45,6 +24,10 @@ output = 'pdf/'+__file__[:-3]+'.pdf'
 
 # initialize PDF
 pdf = Document(output, title='Example')
+
+# create your text styles
+h1 = pdf.style('h1', font='Helvetica-Bold', size=20, color='#17365d')
+p  = pdf.style('p',  font='Times-Roman')
 
 # start page applying a specific layout "firstCover"
 pdf.page(layout=firstCover)

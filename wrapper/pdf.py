@@ -3,7 +3,7 @@ from reportlab.platypus import Frame, Paragraph, Image
 from reportlab.lib.utils import ImageReader, simpleSplit
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.lib.units import cm,inch
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet,ParagraphStyle
 from reportlab.lib import pagesizes
 from reportlab.lib.colors import HexColor
 
@@ -203,6 +203,23 @@ class Document(canvas.Canvas):
     self.save()
 
 
+  def style(self, name,font='Helvetica',size=13,letterSpacing=None,color='#000000',marginTop=0,marginBottom=6):
+    ''' returns a function that will create a formatted text  '''
+
+    letterSpacing=size*1.2 if letterSpacing==None else letterSpacing
+    
+    def callBack(text):
+      return Paragraph(text, ParagraphStyle(name,
+       fontName=font,
+       fontSize=size,
+       leading=letterSpacing,
+       textColor=color,
+       spaceBefore=marginTop,
+       spaceAfter=marginBottom
+      ))
+    
+    return callBack
+    
 def checkPercent(string, reference):
   ''' 
   for a given percentage in string (formatted as 'xx%') and an integer as reference,
