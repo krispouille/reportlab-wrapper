@@ -1,4 +1,4 @@
-from wrapper.pdf import Document, landscape, A4
+from wrapper import Document, landscape, A4
 
 output = 'pdf/'+__file__[:-3]+'.pdf'
 
