@@ -1,10 +1,10 @@
 from reportlab.pdfgen import canvas
-from reportlab.platypus import Frame, Paragraph, Image
+from reportlab.platypus import Frame, Paragraph, Image, ParagraphAndImage, Preformatted, Table, TableStyle
 from reportlab.lib.utils import ImageReader, simpleSplit
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.lib.units import cm,inch
 from reportlab.lib.styles import getSampleStyleSheet,ParagraphStyle
-from reportlab.lib import pagesizes
+from reportlab.lib import pagesizes, colors
 from reportlab.lib.colors import HexColor
 
 landscape = pagesizes.landscape
@@ -92,6 +92,18 @@ class Document(canvas.Canvas):
     self.translate(tx,ty)
     
 
+  def frame(self,story,width='100%',height='100%',left=0,bottom=0,top=None,right=None):
+    ''' create a zone that will contain flowable elements '''
+
+    self.saveState()
+    
+    width  = checkPercent(width, self.width)
+    height = checkPercent(height, self.height)
+    x,y    = self.placement(width,height,left,bottom,top,right)
+    f      = Frame(x,y,width,height)
+    f.addFromList(story,self)
+    self.restoreState()
+
   def page(self,*args,**config):
     ''' 
     Configure  a new page in the PDF
@@ -128,6 +140,14 @@ class Document(canvas.Canvas):
         _page(dict(config))
         self.frame(story)
 
+  def _image(self,width=None, height=None):
+
+    w,h = width,height
+
+    def call(filename):  
+      return Image(filename, width=w, height=h)
+    return call
+
   def image(self, filename, width=None, height=None, left=0, bottom=0, top=None, right=None, mask=None, preserveAspectRatio=False, anchor='c'):
     ''' add an image to canvas '''
     
@@ -142,6 +162,45 @@ class Document(canvas.Canvas):
     x, y = self.placement(width, height, left, bottom, top, right)
     self.drawImage(image, x, y, width, height, mask, preserveAspectRatio, anchor)
     self.restoreState()
+
+  def _table(self, vAlign='top', align='left', paddingTop=0, paddingBottom=0, paddingLeft=0, paddingRight=0, colWidths=None):
+    ''' returns a function that will create a configured table '''
+    cfg = [
+      #('BACKGROUND', (0,0),(0,-1), HexColor('#eeeeee')),
+      #('BACKGROUND', (-1,0),(-1,-1), HexColor('#ffcc00')),
+    ]
+    if vAlign!=None:
+      cfg.append(['VALIGN',(0,0),(-1,-1),vAlign.upper()])
+    if align!=None:
+      cfg.append(['ALIGN',(0,0),(-1,-1),align.upper()])
+    if paddingTop!=None: 
+      cfg.append(['TOPPADDING',(0,0),(-1,-1),paddingTop])
+    if paddingBottom!=None: 
+      cfg.append(['BOTTOMPADDING',(0,0),(-1,-1),paddingBottom])
+    if paddingLeft!=None: 
+      cfg.append(['LEFTPADDING',(0,0),(-1,-1),paddingLeft])
+    if paddingRight!=None:
+      cfg.append(['RIGHTPADDING',(0,0),(-1,-1),paddingRight])
+ 
+    def call(*datas):
+     return Table(list(datas), colWidths=colWidths, style=TableStyle(cfg))
+    return call
+  
+  def _text(self,font='Times-Roman',size=13,letterSpacing=None,color='#000000',marginTop=0,marginBottom=6,preformatted=False,style=None):
+    ''' returns a function that will create a formatted text  '''
+
+    letterSpacing=size*1.2 if letterSpacing==None else letterSpacing
+    
+    def call(text):
+        pstyle = ParagraphStyle('p',fontName=font,fontSize=size,leading=letterSpacing,textColor=color,spaceBefore=marginTop,spaceAfter=marginBottom)
+        text = '<b>'+text+'</b>' if style!=None and style.lower()=='bold' else text
+        text = '<i>'+text+'</i>' if style!=None and style.lower()=='italic' else text
+
+        if preformatted==True:
+          return Preformatted(text,pstyle)
+        else:
+          return Paragraph(text,pstyle)
+    return call
 
   def text(self, text, width=None, height=None, left=0, bottom=0, top=None, right=None, style=None):
     ''' add a text/paragraph to canvas '''
@@ -184,17 +243,6 @@ class Document(canvas.Canvas):
 
     self.rectangle(width,height,left,bottom,top,right,color)
   
-  def frame(self,story,width='100%',height='100%',left=0,bottom=0,top=None,right=None):
-    ''' create a zone that will contain flowable elements '''
-
-    self.saveState()
-    
-    width  = checkPercent(width, self.width)
-    height = checkPercent(height, self.height)
-    x,y    = self.placement(width,height,left,bottom,top,right)
-    f      = Frame(x,y,width,height)
-    f.addFromList(story,self)
-    self.restoreState()
 
   def close(self):
     ''' close current page and save the document '''
@@ -202,24 +250,6 @@ class Document(canvas.Canvas):
     self.showPage()
     self.save()
 
-
-  def style(self, name,font='Helvetica',size=13,letterSpacing=None,color='#000000',marginTop=0,marginBottom=6):
-    ''' returns a function that will create a formatted text  '''
-
-    letterSpacing=size*1.2 if letterSpacing==None else letterSpacing
-    
-    def callBack(text):
-      return Paragraph(text, ParagraphStyle(name,
-       fontName=font,
-       fontSize=size,
-       leading=letterSpacing,
-       textColor=color,
-       spaceBefore=marginTop,
-       spaceAfter=marginBottom
-      ))
-    
-    return callBack
-    
 def checkPercent(string, reference):
   ''' 
   for a given percentage in string (formatted as 'xx%') and an integer as reference,
